@@ -16,26 +16,59 @@
     const container = document.getElementById('root');
     const root = ReactDOM.createRoot(container);
     // Передаем данные(массивы из файла data.js)
-    root.render(<App images={images} visibleItems={visibleItems} finishedItems={finishedItems}/>);
+    root.render(<App images={images}/>);
     
     // Отрисовываем игровое поле
-    function App({images, visibleItems, finishedItems}) {
+    function App({images}) {
+    // Создаем пустой массив для отгаданных карточек, когда игрок отгадывает карточки, их id будут добавляться в массив
+      const finishedItems = [];
+    // Шаги
+      const [stepsCount, setStepsCount] = React.useState(0);
+    
+    // Функция для проверки ходов игрока
+      const checkItems = () => {
+    // Увеличение счетчика
+        setStepsCount((i) => i + 1);
+      };
+
       return (
         <section className="game container">
-          <Cards images={images} visibleItems={visibleItems} finishedItems={finishedItems}/>
+          <div className="steps">Шаг {stepsCount}</div>
+          <Cards images={images} finishedItems={finishedItems} checkItems={checkItems}/>
          </section>
       );
     }
     
     
-    function Cards({images, visibleItems, finishedItems}) {
+    
+    function Cards({images, finishedItems, checkItems}) {
+      const [visibleItems, setVisibleItems] = React.useState([]);
+    /* Состояние visibleItems меняется в зависимости от клика по карточке, при первом клике id карточки будет добавлено 
+       в массив visibeleItems, а при повторном удалено из него */
+       const handleCardClick = (id) => {
+    /* Если id содержится в массиве visibleItems, то есть карточка уже открыта (повторный клик по ней), мы обновляем состояние массива, фильтруя его
+       и оставляя в нем только те элементы, которые не равны текущему id */
+        if (visibleItems.includes(id)) {
+          setVisibleItems(visibleItems.filter(item => item !== id));
+        } else {
+    /* Если id не содержится в visibleItems, то есть это первый клик по карточке, мы устанавливаем новое состояние visibleItems,
+       которая будет содержать все элементы из visibleItems, а также новый элемент - переданный в функцию id */
+          setVisibleItems((items) => [...items, id]);
+    // При каждом клике на карточку вызывается функция, которая обновляет состояние ходов 
+          checkItems();
+        }
+      };
+    /* Данный код перебирает все элементы массива images и создает для каждого элемента компонент Card, 
+       далее указаны параметры, передаваемые в компонент */
       const cards = images.map((item) => (
        <Card 
        key={item.id}
+       id={item.id}
        img={item.url}
        text={item.description}
        isShown={visibleItems.includes(item.id)}
        isFinished={finishedItems.includes(item.id)}
+       onCardClick={handleCardClick}
       />
     ));
     return (
@@ -46,17 +79,22 @@
     }
 
     // Компонент самой карточки
-    function Card({img, text, isShown = false, isFinished = true}) {
-    // Добавляем доп.класс карточке в зависимости от того в каком она состоянии. Если она обычная, класс остается ттем же
+    function Card({img, text, isShown, isFinished, onCardClick, id}) {
+    // Добавляем доп.класс карточке в зависимости от того в каком она состоянии. 
        const className = `card ${isShown ? "card-show" : ""} ${isFinished ? "card-finished" : ""}`;
+    // Клик по карточке вызывает функцию onCardClick с передачей в нее id выбранной карточки
+       const handleClick = () => {
+        onCardClick(id);
+       };
        return (
-    // Карточка представляет из себя изображение,каждая имеет свои img и text (взяты из массива, см.компонент Cards)
-      <li className={className}>
+    // Карточка представляет из себя изображение,каждая имеет свои img и text 
+      <li className={className} onClick={handleClick}>
        <img src={img} alt={text} width="204" height="144"/>
-        </li>
+     </li>
      );
   }
 
   </script>
 </body>
 </html>
+
