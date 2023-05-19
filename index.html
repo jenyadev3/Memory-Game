@@ -17,21 +17,39 @@
     const container = document.getElementById('root');
     const root = ReactDOM.createRoot(container);
     // Передаем данные(массивы из файла data.js)
-    root.render(<App images={images}/>);
-
+    root.render(<App images={images} results={results}/>);
     
     // Отрисовываем игровое поле
-    function App({images}) {
+    function App({images, results}) {
+      const [page, setPage] = React.useState(AppRoute.Game);
+      const [result, setResult] = React.useState(0);
+      const showResults = (imagesCount) => {
+        setResult(imagesCount)
+        setPage(AppRoute.Results);
+      };
+      const handleReset = () => {
+        setPage(AppRoute.Game);
+      };
+      const getPage = (route) => {
+        switch (route) {
+          case AppRoute.Game:
+          return <GamePage images={images} onShowResults={showResults}/>;
+          case AppRoute.Results:
+          return (
+            <ResultsPage current={result} results={results} onResetGame={handleReset}/> 
+          );
+          default:
+            return null;
+        }
+       };
+      return getPage(page)
+    }
+
+    const useGame = (images) => {
     // Создаем пустой массив для отгаданных карточек, когда игрок отгадывает карточки, их id будут добавляться в массив
-      const [finishedItems, setFinishedItems] = React.useState([]); 
+    const [finishedItems, setFinishedItems] = React.useState([]); 
     // Шаги
       const [stepsCount, setStepsCount] = React.useState(0);
-    // Сброс игры
-      const handleReset = () => {
-        setFinishedItems([]);
-        setStepsCount(0);
-      }
-
     // Функция для проверки ходов игрока (сравнивает карточки, и если одинаковые, добавляются в массив finishedItems)
       const checkItems = (firstPic, secondPic) => {
         const firstItem = images.find(({id}) => id === firstPic);
@@ -41,13 +59,24 @@
         } 
     // Увеличение счетчика шагов
         setStepsCount((i) => i + 1);
-      }
+      };
+      return {
+        finishedItems,
+        stepsCount,
+        checkItems           
+      };
+     }
 
-
-    // Количество угаданных и количество картинок всего, окончание игры
+    function GamePage({images, onShowResults}) {
+      // Количество угаданных и количество картинок всего, окончание игры
       const max = images.length;
+      const {finishedItems, stepsCount, checkItems} = useGame(images);
       const value = finishedItems.length;
       const isGameOver= value === max;
+
+      const handleResultsClick = () => {
+        onShowResults(value);
+      };
 
       return (
         <section className="game container">
@@ -55,14 +84,14 @@
           <p className="progress-description">Открыто <span>{value / 2}</span> / <span>6</span></p>         
           <div className="steps">Шаг {stepsCount}</div>
           <Cards images={images} finishedItems={finishedItems} checkItems={checkItems}/>
-          {isGameOver && (<Modal className="modal">
-            <h3 className="modal-caption">Победа!</h3>
-            <p className="modal-description">Вы собрали все пары за {stepsCount} шагов</p>
-            <button className="button modal-button" onClick={handleReset} type="button">Новая игра</button>
-          </Modal>
+          {isGameOver && (<Modal>
+              <h3 className="modal-caption">Победа!</h3>
+              <p className="modal-description">Теперь давайте узнаем результаты этой партии</p>
+              <button className="button modal-button" type="button" onClick={handleResultsClick}>Показать результаты</button>
+            </Modal>
           )}
        </section>
-       );
+       );      
       }
 
     function Modal({children, className}) {
@@ -84,7 +113,7 @@
         );
        }
   
-    function Cards({images, finishedItems, checkItems}) {
+    function Cards({images, finishedItems, checkItems, stepsCount}) {
       const [visibleItems, setVisibleItems] = React.useState([]);
        const handleCardClick = (id) => {
         if (visibleItems.includes(id)) {
@@ -97,11 +126,11 @@
           break;
          case 1:
     // Открыта одна карточка - добавляется другая к списку, карточки закрываются по таймеру
-            setVisibleItems((items) => [...items, id]);   
-            checkItems(visibleItems[0], id);      
-            setTimeout(() => {
-              setVisibleItems([]);
-            }, TIMEOUT);   
+          setVisibleItems((items) => [...items, id]);   
+          checkItems(visibleItems[0], id);      
+          setTimeout(() => {
+            setVisibleItems([]);
+          }, TIMEOUT);   
           break;
           default:
             setVisibleItems([]);
@@ -142,6 +171,37 @@
      </li>
      );
     }
+
+    function ResultsPage({result, current, onResetGame }) {
+      const sortedResults = [...results, {name:'Ваш результат', steps: current}].sort((a, b) => b.steps - a.steps);
+      const resultsRows = sortedResults.map(({name, steps}, index) => (
+        <tr key={name} className={`result-table-row ${steps === current ? 'active' : ''}`}>
+          <td>{index + 1}</td>
+          <td>{name}</td>
+          <td>{steps}</td>
+        </tr>
+      ));
+      return (
+        <section className="result container">
+         <h2>Лучшие результаты</h2>
+         <p>Вы завершили игру за <b>16 шагов</b>, так держать!</p>
+         <table className="result-table">
+           <thead>
+           <tr className="result-table-row">
+            <th>Место</th>
+            <th>Имя</th>
+            <th>Шаги</th>
+           </tr>
+           </thead>
+           <tbody>
+            {resultsRows}
+           </tbody>
+         </table>
+         <p>Хотите попробовать ещё раз?</p>
+         <button onClick={onResetGame} className="button result-button" type="button">Новая игра</button>
+        </section>        
+       )
+      }
   </script>
 </body>
 </html>
