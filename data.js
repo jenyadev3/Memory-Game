@@ -49,9 +49,9 @@ const images = [{
 }];
 
 const results = [
-  { name: 'Аня', stepsCount: 16 },
-  { name: 'Вася', stepsCount: 12 },
-  { name: 'Петя', stepsCount: 19 }
+  { name: 'Аня', steps: 16 },
+  { name: 'Вася', steps: 12 },
+  { name: 'Петя', steps: 19 }
 ];
 
 // списки выделенных и отгаданных карточек для отладки
