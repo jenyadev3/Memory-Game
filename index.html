@@ -23,8 +23,8 @@
     function App({images, results}) {
       const [page, setPage] = React.useState(AppRoute.Game);
       const [result, setResult] = React.useState(0);
-      const showResults = (imagesCount) => {
-        setResult(imagesCount)
+      const showResults = (stepsCount) => {
+        setResult(stepsCount)
         setPage(AppRoute.Results);
       };
       const handleReset = () => {
@@ -36,7 +36,7 @@
           return <GamePage images={images} onShowResults={showResults}/>;
           case AppRoute.Results:
           return (
-            <ResultsPage current={result} results={results} onResetGame={handleReset}/> 
+            <ResultsPage stepsCount={result} results={results} onResetGame={handleReset}/> 
           );
           default:
             return null;
@@ -172,19 +172,20 @@
      );
     }
 
-    function ResultsPage({result, current, onResetGame }) {
-      const sortedResults = [...results, {name:'Ваш результат', steps: current}].sort((a, b) => b.steps - a.steps);
-      const resultsRows = sortedResults.map(({name, steps}, index) => (
-        <tr key={name} className={`result-table-row ${steps === current ? 'active' : ''}`}>
+    function ResultsPage({results, current, stepsCount, onResetGame }) {
+      const sortedResults = [...results.map((result) => ({ name: result.name, steps: result.steps })),{ name: 'Ваш результат', steps: stepsCount, isCurrentUser:true }
+].sort((a, b) => b.steps - a.steps);
+      const resultsRows = sortedResults.map(({name, steps, isCurrentUser}, index) => (
+        <tr key={name} className={`result-table-row ${isCurrentUser ? 'active' : ''}`}>
           <td>{index + 1}</td>
           <td>{name}</td>
-          <td>{steps}</td>
+          <td>{isCurrentUser ? stepsCount : steps}</td>
         </tr>
       ));
       return (
         <section className="result container">
          <h2>Лучшие результаты</h2>
-         <p>Вы завершили игру за <b>16 шагов</b>, так держать!</p>
+         <p>Вы завершили игру за <b>{stepsCount}</b> шагов, так держать!</p>
          <table className="result-table">
            <thead>
            <tr className="result-table-row">
