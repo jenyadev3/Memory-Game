@@ -19,7 +19,6 @@
     // Передаем данные(массивы из файла data.js)
     root.render(<App images={images} results={results}/>);
     
-    // Отрисовываем игровое поле
     function App({images, results}) {
       const [page, setPage] = React.useState(AppRoute.Game);
       const [result, setResult] = React.useState(0);
@@ -75,7 +74,7 @@
       const isGameOver= value === max;
 
       const handleResultsClick = () => {
-        onShowResults(value);
+        onShowResults(stepsCount);
       };
 
       return (
@@ -173,7 +172,8 @@
     }
 
     function ResultsPage({results, current, stepsCount, onResetGame }) {
-      const sortedResults = [...results.map((result) => ({ name: result.name, steps: result.steps })),{ name: 'Ваш результат', steps: stepsCount, isCurrentUser:true }
+      const sortedResults = [...results.map((result) => ({ name: result.name, steps: result.steps })),
+      { name: 'Ваш результат', steps: stepsCount, isCurrentUser:true }
 ].sort((a, b) => b.steps - a.steps);
       const resultsRows = sortedResults.map(({name, steps, isCurrentUser}, index) => (
         <tr key={name} className={`result-table-row ${isCurrentUser ? 'active' : ''}`}>
