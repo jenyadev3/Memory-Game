@@ -241,6 +241,14 @@ body {
   --theme-back: url("../img/back-cats.svg");
 }
 
+.cards-theme-flowers {
+  --theme-back: url("../img/back-flowers.svg");
+}
+
+.cards-theme-cars {
+  --theme-back: url("../img/back-cars.svg");
+}
+
 .card {
   display: grid;
   align-items: center;
