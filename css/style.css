@@ -232,13 +232,14 @@ body {
   margin: 0;
   padding: 0;
   list-style: none;
-
   perspective: 1000px; /* Для анимации */
-
-  --theme-back: url("../img/back-cats.svg");
 }
 
 /* класс для смены рубашки карточек, добавляется списку .cards */
+
+.cards-theme-cats {
+  --theme-back: url("../img/back-cats.svg");
+}
 
 .cards-theme-flowers {
   --theme-back: url("../img/back-flowers.svg");

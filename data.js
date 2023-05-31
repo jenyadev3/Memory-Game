@@ -86,8 +86,22 @@ const results = [
   { name: 'Петя', steps: 19 }
 ];
 
+// В функции getImages мы проходим по перемешанному набору карточек (shuffledSet дважды) с помощью цикла for.
+//  Для каждой карточки внутри цикла мы добавляем новый объект в imageSet, используя ...item, и изменяем значение id, добавляя к оригинальному id один знак и индекс (i + 1). Таким образом, у парных картинок будет уникальный id.
+const getImages = (id) => {
+  const selectedSet = imageCollection[id];
+  const shuffledSet = RANDOMIZED ? selectedSet.sort(() => 0.5 - Math.random()) : selectedSet;
 
-const getImages = (id) => RANDOMIZED ? [...imageCollection[id]].sort(() => 0.5 - Math.random()) : [...imageCollection[id]];
+  const imageSet = [];
+
+  for (let i = 0; i < 2; i++) {
+    shuffledSet.forEach((item) => {
+      imageSet.push({ ...item, id: `${item.id}-${i + 1}` });
+    });
+  }
+
+  return imageSet;
+};
 
 
 // списки выделенных и отгаданных карточек для отладки

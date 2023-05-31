@@ -13,7 +13,7 @@ const GAME_TYPES = [
     { type: 'cars', icon: 'cars', label: 'Машины' },
   ];
 
-const RANDOMIZED = false;
+const RANDOMIZED = true;
 
 window.AppRoute = AppRoute;
 window.TIMEOUT = TIMEOUT;
