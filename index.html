@@ -233,7 +233,7 @@
     function ResultsPage({results, current, stepsCount, onResetGame }) {
       const sortedResults = [...results.map((result) => ({ name: result.name, steps: result.steps })),
       { name: 'Ваш результат', steps: stepsCount, isCurrentUser:true }
-      ].sort((a, b) => b.steps - a.steps);
+      ].sort((a, b) => a.steps - b.steps);
       const resultsRows = sortedResults.map(({name, steps, isCurrentUser}, index) => (
         <tr key={name} className={`result-table-row ${isCurrentUser ? 'active' : ''}`}>
           <td>{index + 1}</td>
